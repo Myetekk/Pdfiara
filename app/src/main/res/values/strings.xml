@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Pdf</string>
+    <string name="paint">Paint</string>
+    <string name="add_text">Text</string>
+    <string name="clear">Clear</string>
+    <string name="save">Save</string>
+    <string name="open">OPEN</string>
+    <string name="close">CLOSE</string>
 </resources>

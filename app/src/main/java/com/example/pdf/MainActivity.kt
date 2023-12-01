@@ -10,11 +10,19 @@ import android.graphics.Path
 import android.os.Bundle
 import android.os.Environment
 import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
+import android.widget.Toolbar
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 import com.itextpdf.text.Document
 import com.itextpdf.text.Image
 import com.itextpdf.text.Version.getInstance
@@ -22,17 +30,25 @@ import com.itextpdf.text.pdf.PdfWriter
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.PrintWriter
 
 
 var isText = false
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+    private lateinit var drawerLayout: DrawerLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
+
+
+
         val canvasView = findViewById<CanvasView>(R.id.canvasView)
-        val addText = findViewById(R.id.addText) as Button
-        val clear = findViewById(R.id.clear) as Button
-        val save = findViewById(R.id.save) as Button
+        val addText = findViewById<Button>(R.id.addText)
+        val clear = findViewById<Button>(R.id.clear)
+        val save = findViewById<Button>(R.id.save)
         addText.setOnClickListener {
             isText = true
         }
@@ -43,8 +59,37 @@ class MainActivity : AppCompatActivity() {
             canvasView.createPDF()
         }
 
+
+
+
+
+        drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
+
+        val navigationView = findViewById<NavigationView>(R.id.nav_view)
+        navigationView.setNavigationItemSelectedListener(this)
+
+        val toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        val canvasView = findViewById<CanvasView>(R.id.canvasView)
+
+        when(item.itemId){
+//            R.id.addText -> isText = true
+//            R.id.clear -> canvasView.clearCanvas()
+//            R.id.save -> canvasView.createPDF()
+        }
+        drawerLayout.closeDrawer(GravityCompat.START)
+
+        return true
     }
 }
+
+
+
 
 
 class CanvasView(context: Context?, attrs: AttributeSet?) :
@@ -98,7 +143,7 @@ class CanvasView(context: Context?, attrs: AttributeSet?) :
                 MotionEvent.ACTION_DOWN -> {
                     val x = event.x
                     val y = event.y
-                    val textField = TextField("Nowy tekst", x, y, 120f, Color.BLACK)
+                    val textField = TextField("Nowy tekst", x, y, 100f, Color.BLACK)
                     textFields.add(textField)
                     selectedTextField = textField
 
