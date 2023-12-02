@@ -25,40 +25,75 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/addText"
-            android:layout_width="wrap_content"
-            android:layout_height="70dp"
-            android:layout_weight="1"
-            app:layout_constraintHorizontal_weight="1"
-            android:backgroundTint="@color/white"
-            android:text="Text"
-            android:textSize="20sp"
-            android:textColor="@color/black"
-            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="11">
 
-        <Button
-            android:id="@+id/clear"
-            android:layout_width="wrap_content"
-            android:layout_height="70dp"
-            android:layout_weight="1"
-            android:backgroundTint="@color/white"
-            android:text="Clear"
-            android:textSize="20sp"
-            android:textColor="@color/black" />
+            <ImageButton
+                android:id="@+id/addImage"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/image_icon"
+                android:backgroundTint="@color/white"
+                android:textSize="20sp"
+                android:textColor="@color/black" />
 
-        <Button
-            android:id="@+id/save"
-            android:layout_width="wrap_content"
-            android:layout_height="70dp"
-            android:layout_weight="1"
-            android:drawableLeft="@android:drawable/ic_menu_save"
-            android:backgroundTint="@color/white"
-            android:text="Save"
-            android:textSize="20sp"
-            android:textColor="@color/black" />
+            <ImageButton
+                android:id="@+id/addText"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/text_icon"
+                android:backgroundTint="@color/white"
+                android:textSize="20sp"
+                android:textColor="@color/black" />
+
+            <ImageButton
+                android:id="@+id/save"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/save_icon"
+                android:backgroundTint="@color/white"
+                android:textSize="15sp"
+                android:textColor="@color/black" />
+
+            <ImageButton
+                android:id="@+id/clear"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/trash_can_icon"
+                android:backgroundTint="@color/white"
+                android:textSize="20sp"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/image_test"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="50dp"
+                android:src="@drawable/ic_launcher_background"
+                />
+
+        </LinearLayout>
 
     </LinearLayout>
 
