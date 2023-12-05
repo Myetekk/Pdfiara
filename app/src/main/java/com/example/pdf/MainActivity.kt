@@ -34,7 +34,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.drawToBitmap
 import androidx.drawerlayout.widget.DrawerLayout
-import com.example.pdf.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
 import com.itextpdf.text.Document
 import com.itextpdf.text.Image
@@ -183,6 +182,7 @@ class CanvasView(context: Context?, attrs: AttributeSet?) :
 
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        // edytowanie pola tekstowego (double click)
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 val x = event.x
@@ -202,7 +202,7 @@ class CanvasView(context: Context?, attrs: AttributeSet?) :
         }
 
 
-
+        //tworzenie pola tekstowego
         if(isText){
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -215,6 +215,9 @@ class CanvasView(context: Context?, attrs: AttributeSet?) :
             }
             isText = false
         }
+
+
+        // Rysowanie palcem
         else if(selectedTextField == null){
             val pointX = event.x
             val pointY = event.y
@@ -226,6 +229,9 @@ class CanvasView(context: Context?, attrs: AttributeSet?) :
                 else -> return false
             }
         }
+
+
+        //Przesuwanie zaznaczonego tekstu
         else {
             if (selectedTextField != null) {
                 when (event.action) {
@@ -376,7 +382,7 @@ class CanvasView(context: Context?, attrs: AttributeSet?) :
 
 
 
-
+// Zmiana na bytearray -> canvas na png
 fun Bitmap.convertToByteArray(): ByteArray {
     val stream = ByteArrayOutputStream()
     this.compress(Bitmap.CompressFormat.PNG, 100, stream)
