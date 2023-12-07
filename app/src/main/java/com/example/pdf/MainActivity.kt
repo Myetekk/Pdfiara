@@ -1,80 +1,49 @@
 package com.example.pdf
 
-import android.app.Activity
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.ImageDecoder
 import android.graphics.Paint
 import android.graphics.Path
-import android.net.Uri
+import android.graphics.Rect
 import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.Toast
-import android.widget.Toolbar
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
-import androidx.core.view.drawToBitmap
 import androidx.drawerlayout.widget.DrawerLayout
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.SimpleTarget
 import com.google.android.material.navigation.NavigationView
 import com.itextpdf.text.Document
 import com.itextpdf.text.Image
-import com.itextpdf.text.Version.getInstance
 import com.itextpdf.text.pdf.PdfWriter
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.FileOutputStream
-import java.io.PrintWriter
-
 
 
 var isText = false
-var isImage = false
 
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     private lateinit var drawerLayout: DrawerLayout
-//    lateinit var binding: ActivityMainBinding
-
-    val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) {
-        val galleryUri = it
-        try {
-            val imageView = findViewById<ImageView>(R.id.image_test)
-            imageView.setImageURI(galleryUri)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-//        binding = ActivityMainBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-
-
-
 
 
 
@@ -82,14 +51,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val canvasView = findViewById<CanvasView>(R.id.canvasView)
 
-        val addImage = findViewById<ImageButton>(R.id.addImage)
         val addText = findViewById<ImageButton>(R.id.addText)
         val clear = findViewById<ImageButton>(R.id.clear)
         val save = findViewById<ImageButton>(R.id.save)
 
-        addImage.setOnClickListener{
-            galleryLauncher.launch("image/*")
-        }
         addText.setOnClickListener {
             isText = true
         }
@@ -104,6 +69,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
 
+        // sterowanie sidebarem
         drawerLayout = findViewById(R.id.drawer_layout)
 
         val navigationView = findViewById<NavigationView>(R.id.nav_view)
@@ -117,6 +83,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
 
+
+
+    // sterowanie itemami w sidebarze
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
 //            instrukcja do przechodzenia pomiędzy stronami
@@ -140,6 +109,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 class CanvasView(context: Context?, attrs: AttributeSet?) :
     View(context, attrs) {
     private val textFields = ArrayList<TextField>()
+    private val imageFields = ArrayList<ImageField>()
     private val path: Path = Path()
     private val paint = Paint()
     private var selectedTextField: TextField? = null
@@ -165,6 +135,7 @@ class CanvasView(context: Context?, attrs: AttributeSet?) :
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawPath(path, paint)
+
         for (textField in textFields) {
             val paint = Paint().apply {
                 color = textField.textColor
@@ -172,9 +143,6 @@ class CanvasView(context: Context?, attrs: AttributeSet?) :
             }
             canvas.drawText(textField.text, textField.x, textField.y, paint)
         }
-
-//        val imageView = findViewById<ImageView>(R.id.image_test)
-//        canvas.drawBitmap(imageView.drawToBitmap(), 100F, 100F, paint)
     }
 
 
@@ -258,12 +226,6 @@ class CanvasView(context: Context?, attrs: AttributeSet?) :
             }
         }
 
-
-
-        if(isImage) {
-
-        }
-
         invalidate()
         return true
     }
@@ -328,15 +290,10 @@ class CanvasView(context: Context?, attrs: AttributeSet?) :
 
 
 
-//
-
-
-
-
-
     fun clearCanvas() {
         path.reset()
         textFields.clear()
+        imageFields.clear()
         invalidate()
 
     }
@@ -399,4 +356,13 @@ class TextField(
     var y: Float,
     var textSize: Float,
     var textColor: Int
+)
+
+
+
+
+
+class ImageField(
+    var x: Float,
+    var y: Float
 )

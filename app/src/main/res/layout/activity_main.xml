@@ -35,16 +35,6 @@
             android:layout_weight="11">
 
             <ImageButton
-                android:id="@+id/addImage"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/image_icon"
-                android:backgroundTint="@color/white"
-                android:textSize="20sp"
-                android:textColor="@color/black" />
-
-            <ImageButton
                 android:id="@+id/addText"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -84,14 +74,7 @@
             android:orientation="vertical"
             android:layout_weight="1">
 
-            <ImageView
-                android:id="@+id/image_test"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="50dp"
-                android:src="@drawable/ic_launcher_background"
-                />
+
 
         </LinearLayout>
 
