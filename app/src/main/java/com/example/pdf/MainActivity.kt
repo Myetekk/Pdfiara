@@ -1,15 +1,12 @@
 package com.example.pdf
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.Rect
 import android.os.Bundle
 import android.os.Environment
 import android.util.AttributeSet
@@ -22,28 +19,44 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.SimpleTarget
 import com.google.android.material.navigation.NavigationView
 import com.itextpdf.text.Document
 import com.itextpdf.text.Image
 import com.itextpdf.text.pdf.PdfWriter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.FileOutputStream
 
 
 var isText = false
 
+//val libraryPdfiara = Library_Pdfiara()
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     private lateinit var drawerLayout: DrawerLayout
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
+
+
+
+
+
+
+
+
+        val content = "W tym tygodniu zatwierdzono slawetny aneks nr. 4. Co to oznacza? To ze w tym momencie mamy klepniete uzbrojenie i wyposazenie dla WSZYSTKICH TRZECH fregat rakietowych budowanych w ramach programu Miecznik. Okej, to nie oznacza 100% wyposazenia i uzbrojenia ale cyferke stojaca bardzo blisko tych 100% ktora uzasadnia stwierdzenie ze dla wszystkich 3 przyszlych fregat mamy uzbrojenie i wyposazenie. Koniec obaw o tym ze Miecznik skonczy jak Slazak 2.0 z gotowymi platformami ale bez pelnego uzbrojenia i wyposazenia, koniec obaw o to ze zamawiając reszte wyposazenia i uzbrojenia okaze sie ze albo jest ono znacznie drozsze albo 'mamy tylko nowy model'. Przed programem stoja kolejne kroki milowe i kolejne wyzwania, zas przed nami dziennikarzami obowiazek dalszego informowania i przekonywania, tak spoleczenstwa jak i nowej ekipy MON, o tym jak potrzebne MW RP i Polsce sa Mieczniki."
+        PdfGenerator.generatePdf(content, "example.pdf")
+
+
+
 
 
 
@@ -87,8 +100,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     // sterowanie itemami w sidebarze
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-//            instrukcja do przechodzenia pomiędzy stronami
+        when(item.itemId){  // instrukcja do przechodzenia pomiędzy stronami
+            R.id.choose_text_pdf -> {
+//                val content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent velit urna, vulputate vel faucibus a, aliquet eu velit. Nunc vestibulum elit mattis nulla viverra, non efficitur ex imperdiet. Aliquam vel fermentum elit. Fusce viverra convallis elit ut consequat. Quisque tristique, mi non malesuada efficitur, erat nibh sodales neque, nec rutrum enim orci id leo. Morbi ut diam sed ante vestibulum euismod non et ipsum. Phasellus lobortis pharetra ultrices. Donec consequat mattis leo, in dignissim lacus egestas sed. Maecenas lacus orci, facilisis in ultricies vel, tempus in arcu. Etiam non lectus et purus tempus malesuada. Sed placerat ante sed nisi iaculis elementum. Sed orci urna, gravida vel felis vitae, tristique egestas felis. Suspendisse vitae tellus sed metus vestibulum tincidunt. Sed sed pulvinar tortor. Suspendisse lacinia suscipit sapien, sit amet viverra ante sollicitudin viverra. Quisque gravida vehicula odio at pellentesque."
+//                PdfGenerator.generatePdf(content, "example.pdf")
+            }
         }
         drawerLayout.closeDrawer(GravityCompat.START)
 
@@ -109,7 +125,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 class CanvasView(context: Context?, attrs: AttributeSet?) :
     View(context, attrs) {
     private val textFields = ArrayList<TextField>()
-    private val imageFields = ArrayList<ImageField>()
     private val path: Path = Path()
     private val paint = Paint()
     private var selectedTextField: TextField? = null
@@ -293,7 +308,6 @@ class CanvasView(context: Context?, attrs: AttributeSet?) :
     fun clearCanvas() {
         path.reset()
         textFields.clear()
-        imageFields.clear()
         invalidate()
 
     }
@@ -310,7 +324,7 @@ class CanvasView(context: Context?, attrs: AttributeSet?) :
         val document = Document()
 
 
-        val pdfFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString() + "/" + "PDFiara" +".pdf"
+        val pdfFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString() + "/" + "PDFiara2" +".pdf"
 
         try {
             val writer = PdfWriter.getInstance(document, FileOutputStream(pdfFile))
@@ -332,6 +346,7 @@ class CanvasView(context: Context?, attrs: AttributeSet?) :
         } finally {
             document.close()
         }
+
     }
 
 }
@@ -362,7 +377,3 @@ class TextField(
 
 
 
-class ImageField(
-    var x: Float,
-    var y: Float
-)

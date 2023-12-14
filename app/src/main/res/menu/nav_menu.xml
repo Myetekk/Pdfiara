@@ -11,7 +11,11 @@
         <item
             android:id="@+id/choose_paint"
             android:title="@string/paint"
+            />
 
+        <item
+            android:id="@+id/choose_text_pdf"
+            android:title="@string/text_pdf"
             />
 
     </group>
