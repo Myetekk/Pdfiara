@@ -14,71 +14,12 @@
 
 
 
-    <com.example.pdf.CanvasView
-        android:id="@+id/canvasView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-
-
-
-
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/frame_in_main_activity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:layout_weight="11">
-
-            <ImageButton
-                android:id="@+id/addText"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/text_icon"
-                android:backgroundTint="@color/white"
-                android:textSize="20sp"
-                android:textColor="@color/black" />
-
-            <ImageButton
-                android:id="@+id/save"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/save_icon"
-                android:backgroundTint="@color/white"
-                android:textSize="15sp"
-                android:textColor="@color/black" />
-
-            <ImageButton
-                android:id="@+id/clear"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/trash_can_icon"
-                android:backgroundTint="@color/white"
-                android:textSize="20sp"
-                android:textColor="@color/black" />
-
-        </LinearLayout>
-
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_weight="1">
-
-
-
-        </LinearLayout>
-
-    </LinearLayout>
+        android:layout_weight="100"
+        />
 
 
 

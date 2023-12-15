@@ -37,6 +37,8 @@ var isText = false
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     private lateinit var drawerLayout: DrawerLayout
+    val fragment_paint = Fragment_paint()
+    val fragment_text_to_pdf = Fragment_text_to_pdf()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,35 +49,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
 
-
-
-
-
-
-        val content = "W tym tygodniu zatwierdzono slawetny aneks nr. 4. Co to oznacza? To ze w tym momencie mamy klepniete uzbrojenie i wyposazenie dla WSZYSTKICH TRZECH fregat rakietowych budowanych w ramach programu Miecznik. Okej, to nie oznacza 100% wyposazenia i uzbrojenia ale cyferke stojaca bardzo blisko tych 100% ktora uzasadnia stwierdzenie ze dla wszystkich 3 przyszlych fregat mamy uzbrojenie i wyposazenie. Koniec obaw o tym ze Miecznik skonczy jak Slazak 2.0 z gotowymi platformami ale bez pelnego uzbrojenia i wyposazenia, koniec obaw o to ze zamawiając reszte wyposazenia i uzbrojenia okaze sie ze albo jest ono znacznie drozsze albo 'mamy tylko nowy model'. Przed programem stoja kolejne kroki milowe i kolejne wyzwania, zas przed nami dziennikarzami obowiazek dalszego informowania i przekonywania, tak spoleczenstwa jak i nowej ekipy MON, o tym jak potrzebne MW RP i Polsce sa Mieczniki."
-        PdfGenerator.generatePdf(content, "example.pdf")
-
-
-
-
-
-
-
-
-        val canvasView = findViewById<CanvasView>(R.id.canvasView)
-
-        val addText = findViewById<ImageButton>(R.id.addText)
-        val clear = findViewById<ImageButton>(R.id.clear)
-        val save = findViewById<ImageButton>(R.id.save)
-
-        addText.setOnClickListener {
-            isText = true
-        }
-        save.setOnClickListener {
-            canvasView.createPDF()
-        }
-        clear.setOnClickListener {
-            canvasView.clearCanvas()
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.frame_in_main_activity, fragment_paint)
+            addToBackStack(null)
+            commit()
         }
 
 
@@ -100,10 +77,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     // sterowanie itemami w sidebarze
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+
         when(item.itemId){  // instrukcja do przechodzenia pomiędzy stronami
             R.id.choose_text_pdf -> {
-//                val content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent velit urna, vulputate vel faucibus a, aliquet eu velit. Nunc vestibulum elit mattis nulla viverra, non efficitur ex imperdiet. Aliquam vel fermentum elit. Fusce viverra convallis elit ut consequat. Quisque tristique, mi non malesuada efficitur, erat nibh sodales neque, nec rutrum enim orci id leo. Morbi ut diam sed ante vestibulum euismod non et ipsum. Phasellus lobortis pharetra ultrices. Donec consequat mattis leo, in dignissim lacus egestas sed. Maecenas lacus orci, facilisis in ultricies vel, tempus in arcu. Etiam non lectus et purus tempus malesuada. Sed placerat ante sed nisi iaculis elementum. Sed orci urna, gravida vel felis vitae, tristique egestas felis. Suspendisse vitae tellus sed metus vestibulum tincidunt. Sed sed pulvinar tortor. Suspendisse lacinia suscipit sapien, sit amet viverra ante sollicitudin viverra. Quisque gravida vehicula odio at pellentesque."
-//                PdfGenerator.generatePdf(content, "example.pdf")
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.frame_in_main_activity, fragment_text_to_pdf)
+                    commit()
+                }
+            }
+
+            R.id.choose_paint -> {
+                supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.frame_in_main_activity, fragment_paint)
+                    commit()
+                }
             }
         }
         drawerLayout.closeDrawer(GravityCompat.START)
@@ -112,268 +99,3 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-class CanvasView(context: Context?, attrs: AttributeSet?) :
-    View(context, attrs) {
-    private val textFields = ArrayList<TextField>()
-    private val path: Path = Path()
-    private val paint = Paint()
-    private var selectedTextField: TextField? = null
-    private var offsetX = 0f
-    private var offsetY = 0f
-    private var lastClickTime: Long = 0
-    private val DOUBLE_CLICK_TIME = 300
-
-
-
-
-
-    init {
-        isFocusable = true
-        isFocusableInTouchMode = true
-        paintSettings()
-    }
-
-
-
-
-
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        canvas.drawPath(path, paint)
-
-        for (textField in textFields) {
-            val paint = Paint().apply {
-                color = textField.textColor
-                textSize = textField.textSize
-            }
-            canvas.drawText(textField.text, textField.x, textField.y, paint)
-        }
-    }
-
-
-
-
-
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        // edytowanie pola tekstowego (double click)
-        when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                val x = event.x
-                val y = event.y
-                selectedTextField = findTextFieldAtPosition(x, y)
-                val clickTime = System.currentTimeMillis()
-                if (clickTime - lastClickTime < DOUBLE_CLICK_TIME) {
-                    val x = event.x
-                    val y = event.y
-                    selectedTextField = findTextFieldAtPosition(x, y)
-                    if (selectedTextField != null) {
-                        startEditingText(selectedTextField!!)
-                    }
-                }
-                lastClickTime = clickTime
-            }
-        }
-
-
-        //tworzenie pola tekstowego
-        if(isText){
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    val x = event.x
-                    val y = event.y
-                    val textField = TextField("Nowy tekst", x, y, 100f, Color.BLACK)
-                    textFields.add(textField)
-                    selectedTextField = textField
-                }
-            }
-            isText = false
-        }
-
-
-        // Rysowanie palcem
-        else if(selectedTextField == null){
-            val pointX = event.x
-            val pointY = event.y
-            when (event.action) {
-                MotionEvent.ACTION_DOWN ->
-                    path.moveTo(pointX, pointY)
-                MotionEvent.ACTION_MOVE ->
-                    path.lineTo(pointX, pointY)
-                else -> return false
-            }
-        }
-
-
-        //Przesuwanie zaznaczonego tekstu
-        else {
-            if (selectedTextField != null) {
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        val x = event.x
-                        val y = event.y
-                        selectedTextField = findTextFieldAtPosition(x, y)
-                        if (selectedTextField != null) {
-                            offsetX = selectedTextField!!.x - x
-                            offsetY = selectedTextField!!.y - y
-                        }
-                    }
-                    MotionEvent.ACTION_MOVE -> {
-                        selectedTextField?.let { textField ->
-                            textField.x = event.x + offsetX
-                            textField.y = event.y + offsetY
-                            invalidate()
-                        }
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        selectedTextField = null
-                    }
-                }
-            }
-        }
-
-        invalidate()
-        return true
-    }
-
-
-
-
-
-    private fun paintSettings() {
-        paint.style = Paint.Style.STROKE
-        paint.color = Color.BLUE
-        paint.strokeWidth = 10f
-    }
-
-
-
-
-
-    private fun findTextFieldAtPosition(x: Float, y: Float): TextField? {
-        for (textField in textFields) {
-            if (x >= textField.x && x <= textField.x + measureTextWidth(textField) &&
-                y >= textField.y - textField.textSize && y <= textField.y
-            ) {
-                return textField
-            }
-        }
-        return null
-    }
-
-
-
-
-
-    private fun measureTextWidth(textField: TextField): Float {
-        val paint = Paint().apply {
-            textSize = textField.textSize
-        }
-        return paint.measureText(textField.text)
-    }
-
-
-
-
-
-    private fun startEditingText(textField: TextField) {
-        val alertDialog = AlertDialog.Builder(context)
-        val editText = EditText(context)
-        alertDialog.setView(editText)
-        alertDialog.setPositiveButton("Zapisz") { _, _ ->
-            val newText = editText.text.toString()
-            textField.text = newText
-            invalidate()
-        }
-        alertDialog.setNegativeButton("Anuluj") { dialog, _ ->
-            dialog.dismiss()
-        }
-        alertDialog.show()
-        editText.setText(textField.text)
-    }
-
-
-
-
-
-    fun clearCanvas() {
-        path.reset()
-        textFields.clear()
-        invalidate()
-
-    }
-
-
-
-
-
-    fun createPDF() {
-        val pageWidth = 612f
-        val pageHeight = 792f
-
-
-        val document = Document()
-
-
-        val pdfFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString() + "/" + "PDFiara2" +".pdf"
-
-        try {
-            val writer = PdfWriter.getInstance(document, FileOutputStream(pdfFile))
-
-            document.open()
-
-            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
-            draw(canvas)
-
-            val scale = minOf(pageWidth / width, pageHeight / height)
-            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, (width * scale).toInt(), (height * scale).toInt(), false)
-
-            val image = Image.getInstance(scaledBitmap.convertToByteArray(), true)
-            document.add(image)
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-            document.close()
-        }
-
-    }
-
-}
-
-
-
-
-// Zmiana na bytearray -> canvas na png
-fun Bitmap.convertToByteArray(): ByteArray {
-    val stream = ByteArrayOutputStream()
-    this.compress(Bitmap.CompressFormat.PNG, 100, stream)
-    return stream.toByteArray()
-}
-
-
-
-
-
-class TextField(
-    var text: String,
-    var x: Float,
-    var y: Float,
-    var textSize: Float,
-    var textColor: Int
-)
-
-
-
-
-
