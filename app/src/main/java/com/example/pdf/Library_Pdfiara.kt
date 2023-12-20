@@ -85,10 +85,10 @@ class PdfGenerator {
 
 
     fun savePDF() {
+        // dodanie nagłówka z wersją PDF'a
+        addHeader()
+
         // zapisywanie wszystkich tekstów
-        for (text in texts){    // wpisanie wszystkich textboxów do pliku
-            addTextToPDF(text)
-        }
         saveText()    // dodajemy stopke textów do pliku
 
         // zapisywanie wszystkich obrazów
@@ -100,6 +100,30 @@ class PdfGenerator {
         // zapisanie stopki
         addTrailer()    // dodajemy stopke całego pliku PDF
     }
+
+
+
+
+
+
+
+
+
+    private fun addHeader() {
+        val filePath = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString(),
+            fileName
+        )
+
+        try {
+            val outputStream = FileOutputStream(filePath, true)
+            outputStream.write("%PDF-1.7 \n".toByteArray())
+
+        }catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
 
 
 
@@ -129,7 +153,7 @@ class PdfGenerator {
             var index_space = 0
 
             if (textBoxes == 0){    // zwinięcie do if żeby można wywoływać funkcję 'addText' wiele razy
-                outputStream.write("%PDF-1.7 \n".toByteArray())
+//                outputStream.write("%PDF-1.7 \n".toByteArray())
                 outputStream.write("$object_counter 0 obj\n".toByteArray())
                 outputStream.write("<< /Length 44 >>\n".toByteArray())
                 outputStream.write("stream\n".toByteArray())
@@ -198,6 +222,10 @@ class PdfGenerator {
         try {
             val outputStream = FileOutputStream(filePath, true)
 
+
+            for (text in texts){    // wpisanie wszystkich textboxów do pliku
+                addTextToPDF(text)
+            }
 
             // zamknięcie textu z funkcji 'addText'
             outputStream.write("endstream\n".toByteArray())

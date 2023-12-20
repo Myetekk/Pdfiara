@@ -48,7 +48,7 @@ class Fragment_text_to_pdf : Fragment() {
             newFile1.addText("Taka sobie druga linia ")
             newFile1.addText("Jakas trzecia linia ")
             newFile1.addText("A tu czwarta ")
-            newFile1.addText("tekst podany ze współrzednymi", 300, 730)
+            newFile1.addText("tekst podany ze wspołrzednymi", 300, 730)
             newFile1.savePDF()
         }
 
