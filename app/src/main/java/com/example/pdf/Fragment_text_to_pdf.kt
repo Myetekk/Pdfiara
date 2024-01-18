@@ -66,7 +66,7 @@ class Fragment_text_to_pdf : Fragment() {
 
             val imageFilePath = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString() + "/Image.jpg" )
 
-            newFile.addImage( imageFilePath, 200, 200)
+            newFile.addImage( imageFilePath, "Image1", 100, 600)
             newFile.savePDF()
         }
 

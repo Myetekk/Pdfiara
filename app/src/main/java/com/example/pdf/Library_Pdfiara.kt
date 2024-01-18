@@ -14,17 +14,16 @@ private class TextBox {
     var x: Int = 70  // współrzędna X
     var y: Int = 700  // współrzędna Y
     var withCordinates: Boolean = false    // określa czy współrzędne mają się określić automatycznie czy zostały wprowadzone ręcznie
-    var type: String = ""
-
-    // dla obrazów
+}
+private class ImageBox {
+    lateinit var image_bytes: ByteArray  // obraz w formi bitowej
+    lateinit var image_name: String
+    var x: Int = 70  // współrzędna X
+    var y: Int = 700  // współrzędna Y
     var image_width: Int = 700  // szerokość obrazu
     var image_height: Int = 700  // wysokość obrazu
-    lateinit var image_bytes: ByteArray  // obraz w formi bitowej
-
+    var location_in_code: Int = 0
 }
-//private class Image {
-//
-//}
 
 
 
@@ -54,6 +53,7 @@ class PdfGenerator {
     private var position_y = 700    // pozycja y tekstu na stronie
     private var textBoxes = 0    // licznik textBoxów, potrzebny tylko aby zacząć plik
     private var texts: MutableList<TextBox> = ArrayList()    // lista textBoxów zawierająca wszystkie textBoxy XD
+    private var images: MutableList<ImageBox> = ArrayList()    // lista ImageBoxów zawierająca wszystkie ImageBoxy XD
     private var root = 0  // lokalizacja obiektu nadrzędnego
 
 
@@ -84,26 +84,27 @@ class PdfGenerator {
 
 
 
-    fun addImage(imageFilePath: File, x: Int, y: Int) {
+    fun addImage(imageFilePath: File, imageName: String, x: Int, y: Int) {
         val imageBytes: ByteArray = Files.readAllBytes(Paths.get(imageFilePath.path))  // obraz w formi binarnej
 
         // Create a Text Box for the image
-        val imageTextBox = TextBox()
-        imageTextBox.x = x  // przypisanie współrzędnej X
-        imageTextBox.y = y  // przypisanie współrzędnej Y
-        imageTextBox.image_bytes = imageBytes
-        imageTextBox.withCordinates = true
-        imageTextBox.type = "image"
+        val imagetBox = ImageBox()
+        imagetBox.image_bytes = imageBytes
+        imagetBox.image_name = imageName
+        imagetBox.x = x  // przypisanie współrzędnej X
+        imagetBox.y = y  // przypisanie współrzędnej Y
+//        imagetBox.withCordinates = true
+//        imagetBox.type = "image"
 
         // dobranie się do szerokości i wysokości obrazu
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
         BitmapFactory.decodeFile(File(imageFilePath.path).absolutePath, options)
 
-        imageTextBox.image_width = options.outWidth  // przypisanie szerokości obrazu
-        imageTextBox.image_height = options.outHeight  // przypisanie wysokości obrazu
+        imagetBox.image_width = options.outWidth  // przypisanie szerokości obrazu
+        imagetBox.image_height = options.outHeight  // przypisanie wysokości obrazu
 
-        texts.add(imageTextBox)
+        images.add(imagetBox)
     }
 
 
@@ -119,7 +120,7 @@ class PdfGenerator {
     fun savePDF() {
         addHeader()  // nagłówek pliku PDF
 
-        saveTextImage()    // dodanie wszystkich tekstów, obrazów i grafiki wektorowej, oraz zapisanie roota
+        saveThings()    // dodanie wszystkich tekstów, obrazów i grafiki wektorowej, oraz zapisanie roota
 
         addTrailer()    // dodanie stopki całego pliku PDF
     }
@@ -236,7 +237,8 @@ class PdfGenerator {
 
 
 
-    private fun addImageToPDF(imageBytes: ByteArray, width: Int, height:Int){
+//    private fun addImageToPDF(imageBytes: ByteArray, imageName: String, width: Int, height:Int){
+    private fun addImageToPDF(image: ImageBox){
         val filePath = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString(),
             fileName
@@ -246,21 +248,22 @@ class PdfGenerator {
             val outputStream = FileOutputStream(filePath, true)
 
             outputStream.write("$object_counter 0 obj\n".toByteArray())
-            outputStream.write("<< /Type /XObject /Subtype /Image /Name /Im$object_counter\n".toByteArray())
-            outputStream.write("/Width $width /Height $height /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imageBytes.size} >>\n".toByteArray())
+            outputStream.write("<< /Type /XObject /Subtype /Image /Name /${image.image_name} \n".toByteArray())
+            outputStream.write("/Width ${image.image_width} /Height ${image.image_height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${image.image_bytes.size} >>\n".toByteArray())
             outputStream.write("stream\n".toByteArray())
-            outputStream.write(imageBytes)
+            outputStream.write(image.image_bytes)
             outputStream.write("endstream \n".toByteArray())
             outputStream.write("endobj \n\n\n".toByteArray())
+            image.location_in_code = object_counter
             object_counter++
 
             outputStream.write("$object_counter 0 obj \n".toByteArray())
             outputStream.write("<< /Length 989 >> \n".toByteArray())
             outputStream.write("stream \n".toByteArray())
             outputStream.write("q \n".toByteArray())
-            outputStream.write("144 0 0 100 300 700 cm \n".toByteArray())
+            outputStream.write("100 0 0 100 ${image.x} ${image.y} cm \n".toByteArray())
             outputStream.write("1 0 0 1 0 0 cm \n".toByteArray())
-            outputStream.write("/Im1 Do \n".toByteArray())
+            outputStream.write("/${image.image_name} Do \n".toByteArray())
             outputStream.write("Q \n".toByteArray())
             outputStream.write("endstream \n".toByteArray())
             outputStream.write("endobj \n\n\n".toByteArray())
@@ -281,7 +284,7 @@ class PdfGenerator {
 
 
 
-    private fun saveTextImage() {    // zakończenie edycji tekstu w pliku
+    private fun saveThings() {    // zakończenie edycji tekstu w pliku
         val filePath = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString(),
             fileName
@@ -291,20 +294,18 @@ class PdfGenerator {
         try {
             val outputStream = FileOutputStream(filePath, true)
 
-
+            for (image in images){    // wpisanie wszystkich imageboxów do pliku
+//                addImageToPDF(image.image_bytes, image.image_name, image.image_width, image.image_height)
+                addImageToPDF(image)
+            }
 
             for (text in texts){    // wpisanie wszystkich textboxów do pliku
-                if (text.type == "image") {
-                    addImageToPDF(text.image_bytes, text.image_width, text.image_height)
-                }
-                else {
-                    addTextToPDF(text)
+                addTextToPDF(text)
 
-                    // zamknięcie textu z funkcji 'addText'
-                    outputStream.write("endstream \n".toByteArray())
-                    outputStream.write("endobj \n\n\n".toByteArray())
-                    object_counter++
-                }
+                // zamknięcie textu z funkcji 'addText'
+                outputStream.write("endstream \n".toByteArray())
+                outputStream.write("endobj \n\n\n".toByteArray())
+                object_counter++
             }
 
 
@@ -327,9 +328,16 @@ class PdfGenerator {
             object_counter++
 
             // deklaracje zawartości stron
+            var temp_xObject = ""
+            var temp_contents = ""
+            for (image in images){
+                temp_xObject += "${image.image_name} ${image.location_in_code} 0 R "
+                temp_contents += "${image.location_in_code + 1} 0 R "
+            }
             for (page_number in 1 .. page_counter){
                 outputStream.write("$object_counter 0 obj \n".toByteArray())
-                outputStream.write("<< /Type /Page /Resources <</XObject <</Im1 1 0 R>> >> /Parent ${object_counter-page_number} 0 R /Contents ${page_number+1} 0 R >> \n".toByteArray())
+//                outputStream.write("<< /Type /Page /Resources <</XObject <</$temp_xObject>> >> /Parent ${object_counter-page_number} 0 R /Contents [${page_number} 0 R] >> \n".toByteArray())  // dla tekstu
+                outputStream.write("<< /Type /Page /Resources <</XObject <</$temp_xObject>> >> /Parent ${object_counter-page_number} 0 R /Contents [$temp_contents 0 R] >> \n".toByteArray())  // dla obrazu
                 outputStream.write("endobj \n\n\n".toByteArray())
                 object_counter++
             }
