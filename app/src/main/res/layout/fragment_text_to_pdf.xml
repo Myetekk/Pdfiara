@@ -17,17 +17,17 @@
             android:layout_weight="11">
 
             <ImageButton
-                android:id="@+id/save_text_to_pdf"
+                android:id="@+id/add_text"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/save_icon"
+                android:src="@drawable/text_icon"
                 android:backgroundTint="@color/white"
                 android:textSize="15sp"
                 android:textColor="@color/black" />
 
             <ImageButton
-                android:id="@+id/save_image_to_pdf"
+                android:id="@+id/add_image"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -37,11 +37,11 @@
                 android:textColor="@color/black" />
 
             <ImageButton
-                android:id="@+id/clear_text_to_pdf"
+                android:id="@+id/save_pdf"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/trash_can_icon"
+                android:src="@drawable/save_icon"
                 android:backgroundTint="@color/white"
                 android:textSize="20sp"
                 android:textColor="@color/black" />

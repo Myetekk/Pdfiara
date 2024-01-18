@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.frame_in_main_activity, fragment_paint)
+            replace(R.id.frame_in_main_activity, fragment_text_to_pdf)
             addToBackStack(null)
             commit()
         }
