@@ -27,6 +27,16 @@
                 android:textColor="@color/black" />
 
             <ImageButton
+                android:id="@+id/save_image_to_pdf"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/image_icon"
+                android:backgroundTint="@color/white"
+                android:textSize="15sp"
+                android:textColor="@color/black" />
+
+            <ImageButton
                 android:id="@+id/clear_text_to_pdf"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"

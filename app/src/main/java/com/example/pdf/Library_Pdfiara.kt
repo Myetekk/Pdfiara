@@ -1,23 +1,30 @@
 package com.example.pdf
 
+import android.graphics.BitmapFactory
 import android.os.Environment
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-
-
-
-
-
+import java.nio.file.Files
+import java.nio.file.Paths
 
 
 private class TextBox {
     var text: String = ""
-    var x: Int = 70
-    var y: Int = 700
-
+    var x: Int = 70  // współrzędna X
+    var y: Int = 700  // współrzędna Y
     var withCordinates: Boolean = false    // określa czy współrzędne mają się określić automatycznie czy zostały wprowadzone ręcznie
+    var type: String = ""
+
+    // dla obrazów
+    var image_width: Int = 700  // szerokość obrazu
+    var image_height: Int = 700  // wysokość obrazu
+    lateinit var image_bytes: ByteArray  // obraz w formi bitowej
+
 }
+//private class Image {
+//
+//}
 
 
 
@@ -47,6 +54,7 @@ class PdfGenerator {
     private var position_y = 700    // pozycja y tekstu na stronie
     private var textBoxes = 0    // licznik textBoxów, potrzebny tylko aby zacząć plik
     private var texts: MutableList<TextBox> = ArrayList()    // lista textBoxów zawierająca wszystkie textBoxy XD
+    private var root = 0  // lokalizacja obiektu nadrzędnego
 
 
 
@@ -64,7 +72,6 @@ class PdfGenerator {
 
         texts.add(newText)    // dodajemy nowego textBoxa do listy textBoxów
     }
-
     fun addText(text: String, x: Int, y: Int) {    // funkcja dodawania tekstu z współrzędnymi
         val newText = TextBox()    // tworzymy nowy obiekt klasy textBox
         newText.text = text    // ustawiamy jego text
@@ -77,6 +84,31 @@ class PdfGenerator {
 
 
 
+    fun addImage(imageFilePath: File, x: Int, y: Int) {
+        val imageBytes: ByteArray = Files.readAllBytes(Paths.get(imageFilePath.path))  // obraz w formi binarnej
+
+        // Create a Text Box for the image
+        val imageTextBox = TextBox()
+        imageTextBox.x = x  // przypisanie współrzędnej X
+        imageTextBox.y = y  // przypisanie współrzędnej Y
+        imageTextBox.image_bytes = imageBytes
+        imageTextBox.withCordinates = true
+        imageTextBox.type = "image"
+
+        // dobranie się do szerokości i wysokości obrazu
+        val options = BitmapFactory.Options()
+        options.inJustDecodeBounds = true
+        BitmapFactory.decodeFile(File(imageFilePath.path).absolutePath, options)
+
+        imageTextBox.image_width = options.outWidth  // przypisanie szerokości obrazu
+        imageTextBox.image_height = options.outHeight  // przypisanie wysokości obrazu
+
+        texts.add(imageTextBox)
+    }
+
+
+
+
 
 
 
@@ -85,21 +117,13 @@ class PdfGenerator {
 
 
     fun savePDF() {
-        // dodanie nagłówka z wersją PDF'a
-        addHeader()
+        addHeader()  // nagłówek pliku PDF
 
-        // zapisywanie wszystkich tekstów
-        saveText()    // dodajemy stopke textów do pliku
+        saveTextImage()    // dodanie wszystkich tekstów, obrazów i grafiki wektorowej, oraz zapisanie roota
 
-        // zapisywanie wszystkich obrazów
-
-
-        // zapisywanie wszystkich grafik wektorowych
-
-
-        // zapisanie stopki
-        addTrailer()    // dodajemy stopke całego pliku PDF
+        addTrailer()    // dodanie stopki całego pliku PDF
     }
+
 
 
 
@@ -116,7 +140,7 @@ class PdfGenerator {
         )
 
         try {
-            val outputStream = FileOutputStream(filePath, true)
+            val outputStream = FileOutputStream(filePath, false)
             outputStream.write("%PDF-1.7 \n".toByteArray())
 
         }catch (e: IOException) {
@@ -146,7 +170,7 @@ class PdfGenerator {
 
             var text = textBox_.text    // przypisujemy text danego textBoxa do zmiennej lokalnej
             position_x = textBox_.x    // przypisujemy współrzędną X danego textBoxa do zmiennej lokalnej
-            if (textBox_.withCordinates == true) position_y = textBox_.y    // jeśli użytkownik określił współrzędne ręcznie to przypisujemy współrzędną X danego textBoxa do zmiennej lokalnej
+            if (textBox_.withCordinates) position_y = textBox_.y    // jeśli użytkownik określił współrzędne ręcznie to przypisujemy współrzędną X danego textBoxa do zmiennej lokalnej
             text = text.trim()
 
             var text_temp: String
@@ -163,8 +187,8 @@ class PdfGenerator {
             while (text.length >= 80){    // gdy tekst jest dłuższy niż 80 znaków zawijamy go do nowej lini
                 if (position_y <= 90){    // gdy tekst dojdzie wystarczająco nisko tworzymy nową stronę
                     // zamykamy poprzednią strone
-                    outputStream.write("endstream\n".toByteArray())
-                    outputStream.write("endobj\n".toByteArray())
+                    outputStream.write("endstream \n".toByteArray())
+                    outputStream.write("endobj \n\n\n".toByteArray())
                     object_counter++
 
                     // otwieramy nową strone
@@ -212,7 +236,52 @@ class PdfGenerator {
 
 
 
-    private fun saveText() {    // zakończenie edycji tekstu w pliku
+    private fun addImageToPDF(imageBytes: ByteArray, width: Int, height:Int){
+        val filePath = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString(),
+            fileName
+        )
+
+        try {
+            val outputStream = FileOutputStream(filePath, true)
+
+            outputStream.write("$object_counter 0 obj\n".toByteArray())
+            outputStream.write("<< /Type /XObject /Subtype /Image /Name /Im$object_counter\n".toByteArray())
+            outputStream.write("/Width $width /Height $height /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imageBytes.size} >>\n".toByteArray())
+            outputStream.write("stream\n".toByteArray())
+            outputStream.write(imageBytes)
+            outputStream.write("endstream \n".toByteArray())
+            outputStream.write("endobj \n\n\n".toByteArray())
+            object_counter++
+
+            outputStream.write("$object_counter 0 obj \n".toByteArray())
+            outputStream.write("<< /Length 989 >> \n".toByteArray())
+            outputStream.write("stream \n".toByteArray())
+            outputStream.write("q \n".toByteArray())
+            outputStream.write("144 0 0 100 300 700 cm \n".toByteArray())
+            outputStream.write("1 0 0 1 0 0 cm \n".toByteArray())
+            outputStream.write("/Im1 Do \n".toByteArray())
+            outputStream.write("Q \n".toByteArray())
+            outputStream.write("endstream \n".toByteArray())
+            outputStream.write("endobj \n\n\n".toByteArray())
+            object_counter++
+
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+    private fun saveTextImage() {    // zakończenie edycji tekstu w pliku
         val filePath = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString(),
             fileName
@@ -223,19 +292,28 @@ class PdfGenerator {
             val outputStream = FileOutputStream(filePath, true)
 
 
+
             for (text in texts){    // wpisanie wszystkich textboxów do pliku
-                addTextToPDF(text)
+                if (text.type == "image") {
+                    addImageToPDF(text.image_bytes, text.image_width, text.image_height)
+                }
+                else {
+                    addTextToPDF(text)
+
+                    // zamknięcie textu z funkcji 'addText'
+                    outputStream.write("endstream \n".toByteArray())
+                    outputStream.write("endobj \n\n\n".toByteArray())
+                    object_counter++
+                }
             }
 
-            // zamknięcie textu z funkcji 'addText'
-            outputStream.write("endstream\n".toByteArray())
-            outputStream.write("endobj\n".toByteArray())
-            object_counter++
+
 
             // deklarujemy gdzie znajdują się deklaracje stron
+            root = object_counter
             outputStream.write("$object_counter 0 obj\n".toByteArray())
             outputStream.write("<< /Type /Catalog /Pages ${object_counter+1} 0 R >>\n".toByteArray())
-            outputStream.write("endobj\n".toByteArray())
+            outputStream.write("endobj \n\n\n".toByteArray())
             object_counter++
 
             // deklarujemy gdzie znajdują się deklaracje zawartości stron
@@ -245,14 +323,14 @@ class PdfGenerator {
             }
             outputStream.write("$object_counter 0 obj\n".toByteArray())
             outputStream.write("<< /Type /Pages /Kids [$temp_kids] /Count $page_counter >>\n".toByteArray())
-            outputStream.write("endobj\n".toByteArray())
+            outputStream.write("endobj \n\n\n".toByteArray())
             object_counter++
 
             // deklaracje zawartości stron
             for (page_number in 1 .. page_counter){
                 outputStream.write("$object_counter 0 obj \n".toByteArray())
-                outputStream.write("<< /Type /Page /Parent ${object_counter-page_number} 0 R /Contents $page_number 0 R >> \n".toByteArray())
-                outputStream.write("endobj \n".toByteArray())
+                outputStream.write("<< /Type /Page /Resources <</XObject <</Im1 1 0 R>> >> /Parent ${object_counter-page_number} 0 R /Contents ${page_number+1} 0 R >> \n".toByteArray())
+                outputStream.write("endobj \n\n\n".toByteArray())
                 object_counter++
             }
 
@@ -284,7 +362,7 @@ class PdfGenerator {
 
             // deklarujemy ilość obiektów, lokaizacje głównego obiektu i zamykamy plik
             outputStream.write("trailer\n".toByteArray())
-            outputStream.write("<< /Size ${object_counter-1} /Root ${page_counter+1} 0 R >>\n".toByteArray())
+            outputStream.write("<< /Size ${object_counter-1} /Root $root 0 R >>\n".toByteArray())
             outputStream.write("startxref\n".toByteArray())
             outputStream.write("357\n".toByteArray())
             outputStream.write("%%EOF\n".toByteArray())
