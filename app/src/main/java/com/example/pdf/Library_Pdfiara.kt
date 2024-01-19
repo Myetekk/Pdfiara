@@ -9,6 +9,17 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 
+
+class Pages {
+    var index: Int = 0  // numeracja stron
+    var texts: MutableList<TextBox> = ArrayList()    // lista zawierająca wszystkie teksty na danej stronie
+    var images: MutableList<ImageBox> = ArrayList()    // lista zawierająca wszystkie obrazy na danej stronie
+    var vectors: MutableList<VectorGraphicBox> = ArrayList()    // lista zawierająca wszystkie obrazy na danej stronie
+    var location_in_code: Int = 0  // index deklaracji strony w kodzie pdf
+}
+
+
+
 class TextBox {
     var text: String = ""  // text textboxa XD
     var x: Int = 70  // współrzędna X
@@ -27,17 +38,19 @@ class ImageBox {
     var image_height: Int = 1  // wysokość obrazu
     var image_scale_x: Int = 100  // skalowanie obrazu w X
     var image_scale_y: Int = 100  // skalowanie obrazu w Y
-    var location_in_code: Int = 0  // index textboxa w kodzie pdf
+    var location_in_code: Int = 0  // index imageboxa w kodzie pdf
 }
 
 
 
-class Pages {
-    var index: Int = 0  // numeracja stron
-    var texts: MutableList<TextBox> = ArrayList()    // lista zawierająca wszystkie teksty na danej stronie
-    var images: MutableList<ImageBox> = ArrayList()    // lista zawierająca wszystkie obrazy na danej stronie
-    var location_in_code: Int = 0  // index deklaracji strony w kodzie pdf
-
+class VectorGraphicBox {
+    var type: String = ""  // typ grafiki: line, circle
+    var x1: Int = 200  // współrzędna X1
+    var y1: Int = 600  // współrzędna Y1
+    var x2: Int = 200  // współrzędna X2
+    var y2: Int = 600  // współrzędna Y2
+    var a: Int = 100  // dla trójkąta i kwadratu długość boku, a dla koła promień
+    var location_in_code: Int = 0  // index vectorboxa w kodzie pdf
 }
 
 
@@ -120,7 +133,6 @@ class PdfGenerator {
         imageBox.image_width = options.outWidth  // przypisanie szerokości obrazu
         imageBox.image_height = options.outHeight  // przypisanie wysokości obrazu
 
-
         page.images.add(imageBox)  // dodanie obrazu do listy
     }
 
@@ -138,8 +150,52 @@ class PdfGenerator {
         imageBox.image_scale_x = scale_x  // przypisanie skali obrazu w X
         imageBox.image_scale_y = scale_y  // przypisanie skali obrazu w Y
 
-
         page.images.add(imageBox)  // dodanie obrazu do listy
+    }
+
+
+
+
+
+    fun addLine(page: Pages, x1: Int, y1: Int, x2: Int, y2: Int) {    // dodawanie lini
+        val vectorGraphicBox = VectorGraphicBox()  // tworzymy nowy obiekt lini - klasy VectorGraphicBox
+        vectorGraphicBox.type = "line"  // ustawiamy typ grafiki
+        vectorGraphicBox.x1 = x1  // ustawiamy współrzędną x1
+        vectorGraphicBox.y1 = y1  // ustawiamy współrzędną y1
+        vectorGraphicBox.x2 = x2  // ustawiamy współrzędną x2
+        vectorGraphicBox.y2 = y2  // ustawiamy współrzędną y2
+
+        page.vectors.add(vectorGraphicBox)  // dodanie obrazu do listy
+    }
+
+    fun addTriangle(page: Pages, x: Int, y: Int, a: Int) {    // dodawanie trójkąta
+        val vectorGraphicBox = VectorGraphicBox()  // tworzymy nowy obiekt trójkąta - klasy VectorGraphicBox
+        vectorGraphicBox.type = "triangle"  // ustawiamy typ grafiki
+        vectorGraphicBox.x1 = x  // ustawiamy współrzędną x1
+        vectorGraphicBox.y1 = y  // ustawiamy współrzędną y1
+        vectorGraphicBox.a = a  // ustawiamy bok trójkąta
+
+        page.vectors.add(vectorGraphicBox)  // dodanie obrazu do listy
+    }
+
+    fun addSquare(page: Pages, x: Int, y: Int, a: Int) {    // dodawanie kwadratu
+        val vectorGraphicBox = VectorGraphicBox()  // tworzymy nowy obiekt kwadratu - klasy VectorGraphicBox
+        vectorGraphicBox.type = "square"  // ustawiamy typ grafiki
+        vectorGraphicBox.x1 = x  // ustawiamy współrzędną x1
+        vectorGraphicBox.y1 = y  // ustawiamy współrzędną y1
+        vectorGraphicBox.a = a  // ustawiamy bok kwadratu
+
+        page.vectors.add(vectorGraphicBox)  // dodanie obrazu do listy
+    }
+
+    fun addCircle(page: Pages, x: Int, y: Int, r: Int ) {    // dodawanie koła
+        val vectorGraphicBox = VectorGraphicBox()  // tworzymy nowy obiekt koła - klasy VectorGraphicBox
+        vectorGraphicBox.type = "circle"  // ustawiamy typ grafiki
+        vectorGraphicBox.x1 = x  // ustawiamy współrzędną x1
+        vectorGraphicBox.y1 = y  // ustawiamy współrzędną y1
+        vectorGraphicBox.a = r  // ustawiamy promień koła
+
+        page.vectors.add(vectorGraphicBox)  // dodanie obrazu do listy
     }
 
 
@@ -157,6 +213,8 @@ class PdfGenerator {
         saveThings()    // dopisanie wszystkich tekstów, obrazów i grafiki wektorowej, oraz zapisanie roota
 
         addTrailer()    // dopisanie stopki  pliku PDF
+
+        pages.clear()    // usunięcie zawartości listy po zapisaniu, żeby po zapisaniu nie zapisywać wielokrotnie tego samego
     }
 
 
@@ -268,6 +326,45 @@ class PdfGenerator {
 
 
 
+    private fun addVectorToPDF(vector: VectorGraphicBox){
+        val filePath = File(  // lokalizacja pliku PDF
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString(),
+            fileName
+        )
+
+        try {
+            val outputStream = FileOutputStream(filePath, true)
+
+            var drawing_code = ""  // tymczasowa zmienna zawierająca deklarację figury graficznej
+
+            when (vector.type){  // zapisanie odpowiednich danych do pliku PDF w zależności od typu grafiki
+                "line" -> drawing_code = "${vector.x1} ${vector.y1}  m  ${vector.x2} ${vector.y2}  l S"
+                "triangle" -> drawing_code = "${vector.x1 - (vector.a / 2)} ${vector.y1 - (vector.a * 0.433)}  m  ${vector.x1 + (vector.a / 2)} ${vector.y1 - (vector.a * 0.433)}  l  ${vector.x1} ${vector.y1 + (vector.a * 0.433)}  l  h S"
+                "square" -> drawing_code = "${vector.x1 - (vector.a / 2)} ${vector.y1 - (vector.a / 2)}   m   ${vector.x1 + (vector.a / 2)} ${vector.y1 - (vector.a / 2)}   l   ${vector.x1 + (vector.a / 2)} ${vector.y1 + (vector.a / 2)}   l   ${vector.x1 - (vector.a / 2)} ${vector.y1 + (vector.a / 2)}   l   h S"
+                "circle" -> drawing_code = "${vector.x1} ${vector.y1 - vector.a}     m     ${vector.x1 - (vector.a * 0.5523)} ${vector.y1 - vector.a}   ${vector.x1 - vector.a} ${vector.y1 - (vector.a * 0.5523)}   ${vector.x1 - vector.a} ${vector.y1}     c     ${vector.x1 - vector.a} ${vector.y1 + (vector.a * 0.5523)}   ${vector.x1 - (vector.a * 0.5523)} ${vector.y1 + vector.a}   ${vector.x1} ${vector.y1 + vector.a}     c     ${vector.x1 + (vector.a * 0.5523)} ${vector.y1 + vector.a}   ${vector.x1 + vector.a} ${vector.y1 + (vector.a * 0.5523)}   ${vector.x1 + vector.a} ${vector.y1}     c     ${vector.x1 + vector.a} ${vector.y1 - (vector.a * 0.5523)}   ${vector.x1 + (vector.a * 0.5523)} ${vector.y1 - vector.a}   ${vector.x1} ${vector.y1 - vector.a}     c  S "
+            }
+
+            // dopisanie grafiki
+            outputStream.write("$object_counter 0 obj\n".toByteArray())
+            outputStream.write("<< /Length 44 >>\n".toByteArray())
+            outputStream.write("stream\n".toByteArray())
+            outputStream.write("$drawing_code \n".toByteArray())
+            outputStream.write("endstream \n".toByteArray())
+            outputStream.write("endobj \n\n\n".toByteArray())
+            vector.location_in_code = object_counter  // zapisanie indexu tej grafiki
+            object_counter++
+
+            outputStream.close()
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+
+
+
+
 
 
 
@@ -289,6 +386,10 @@ class PdfGenerator {
 
                 for (image in page.images) {    // wpisanie wszystkich obrazów do pliku
                     addImageToPDF(image)
+                }
+
+                for (vector in page.vectors) {    // wpisanie wszystkich grafik wektorowych do pliku
+                    addVectorToPDF(vector)
                 }
 
                 outputStream.write("\n\n\n".toByteArray())  // dla przejrzystości kodu PDF
@@ -327,16 +428,20 @@ class PdfGenerator {
 
             // deklaracje zawartości stron
             for (page in pages) {
-                var temp_xObject = "/"  // deklaracja xObjectu strony (dla obrazów)
+                var temp_xObject = ""  // deklaracja xObjectu strony (dla obrazów)
                 var temp_contents = ""  // deklaracja contentu strony
-
-                for (image in page.images) {  // dopisanie deklaracji dla wszystkich obrazów na danej stronie
-                    temp_xObject += "${image.image_name} ${image.location_in_code} 0 R "
-                    temp_contents += "${image.location_in_code + 1} 0 R  "
-                }
 
                 for (text in page.texts) {  // dopisanie deklaracji dla wszystkich tekstów na danej stronie
                     temp_contents += "${text.location_in_code} 0 R  "
+                }
+
+                for (image in page.images) {  // dopisanie deklaracji dla wszystkich obrazów na danej stronie
+                    temp_xObject += "/${image.image_name} ${image.location_in_code} 0 R "
+                    temp_contents += "${image.location_in_code + 1} 0 R  "
+                }
+
+                for (vector in page.vectors) {  // dopisanie deklaracji dla wszystkich grafik wektorowych na danej stronie
+                    temp_contents += "${vector.location_in_code} 0 R  "
                 }
 
                 outputStream.write("${page.location_in_code} 0 obj \n".toByteArray())

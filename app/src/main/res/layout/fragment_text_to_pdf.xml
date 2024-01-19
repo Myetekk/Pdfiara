@@ -17,33 +17,30 @@
             android:layout_weight="11">
 
             <ImageButton
-                android:id="@+id/add_text"
+                android:id="@+id/add_text_1"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:src="@drawable/text_icon"
                 android:backgroundTint="@color/white"
-                android:textSize="15sp"
                 android:textColor="@color/black" />
 
             <ImageButton
-                android:id="@+id/add_image"
+                android:id="@+id/add_image_1"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:src="@drawable/image_icon"
                 android:backgroundTint="@color/white"
-                android:textSize="15sp"
                 android:textColor="@color/black" />
 
             <ImageButton
-                android:id="@+id/save_pdf"
+                android:id="@+id/add_vector_graphics_1"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/save_icon"
+                android:src="@drawable/vector_graphics_icon"
                 android:backgroundTint="@color/white"
-                android:textSize="20sp"
                 android:textColor="@color/black" />
 
         </LinearLayout>
@@ -53,18 +50,91 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_weight="1">
+            android:orientation="horizontal"
+            android:layout_weight="11">
 
-            <EditText
-                android:id="@+id/textView_text_to_pdf"
-                android:layout_width="match_parent"
+            <ImageButton
+                android:id="@+id/add_text_2"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_margin="40dp"
-                android:padding="0dp"
-                android:paddingTop="10dp"
-                android:gravity="top"
-                />
+                android:layout_weight="1"
+                android:src="@drawable/text_icon"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/black" />
+
+            <ImageButton
+                android:id="@+id/add_image_2"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/image_icon"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/black" />
+
+            <ImageButton
+                android:id="@+id/add_vector_graphics_2"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/vector_graphics_icon"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="11">
+
+            <ImageButton
+                android:id="@+id/add_text_3"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/text_icon"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/black" />
+
+            <ImageButton
+                android:id="@+id/add_image_3"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/image_icon"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/black" />
+
+            <ImageButton
+                android:id="@+id/add_vector_graphics_3"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/vector_graphics_icon"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="11">
+
+            <ImageButton
+                android:id="@+id/save_pdf"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/save_icon"
+                android:backgroundTint="@color/white"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
