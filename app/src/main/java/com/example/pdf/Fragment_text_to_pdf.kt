@@ -58,7 +58,7 @@ class Fragment_text_to_pdf : Fragment() {
 
 
         text_1.setOnClickListener{
-            newFile.addText(page1, "Gapisz mi sie na bebech ", 370, 650)
+            newFile.addText(page1, "Tekst 1 na stronie 1 ", 370, 650)
         }
         image_1.setOnClickListener{
             val imageFilePath1 = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString() + "/Image1.jpg" )
@@ -73,7 +73,7 @@ class Fragment_text_to_pdf : Fragment() {
 
 
         text_2.setOnClickListener{
-            newFile.addText(page2, "Wszyscy sie gapia na bebech bo jest kurwa gigantyczny ", 100, 200)
+            newFile.addText(page2, "Tekst 1 na stronie 2 ", 100, 200)
         }
         image_2.setOnClickListener{
             val imageFilePath2 = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString() + "/Image2.jpg" )
@@ -86,10 +86,10 @@ class Fragment_text_to_pdf : Fragment() {
 
 
         text_3.setOnClickListener{
-            newFile.addText(page3, "Wszyscy teraz sie popatrzymy ", 50, 600)
-            newFile.addText(page3, "I co ", 500, 450)
-            newFile.addText(page3, "Gowno ", 350, 350)
-            newFile.addText(page3, "Z czym masz problem? ", 400, 150)
+            newFile.addText(page3, "Tekst 1 na stronie 3 ", 50, 600)
+            newFile.addText(page3, "Tekst 2 na stronie 3 ", 500, 450)
+            newFile.addText(page3, "Tekst 3 na stronie 3 ", 350, 350)
+            newFile.addText(page3, "Tekst 4 na stronie 3 ", 400, 150)
         }
         image_3.setOnClickListener{
             val imageFilePath3 = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString() + "/Image3.jpg" )
@@ -104,7 +104,16 @@ class Fragment_text_to_pdf : Fragment() {
 
 
         save.setOnClickListener{
+
+//            for (item: Int in 1..200){
+//                val x = newFile.addPage()
+//                val y = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString() + "/Image4.jpg" )
+//                newFile.addText( x, "Jakis tekst: $item", 50, 600)
+//                newFile.addImage(x, y, 315, 540, 150, 150)
+//            }
+
             newFile.savePDF()
+
         }
 
     }
