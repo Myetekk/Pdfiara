@@ -2,12 +2,20 @@
     <string name="app_name">Pdf</string>
 
     <string name="add_text">Text</string>
-    <string name="clear">Clear</string>
-    <string name="save">Save</string>
+    <string name="clear">CLEAR</string>
+    <string name="save">SAVE</string>
 
     <string name="open">OPEN</string>
     <string name="close">CLOSE</string>
 
-    <string name="paint">Paint</string>
-    <string name="text_pdf">Text editor</string>
+    <string name="text">Text</string>
+    <string name="image">Image</string>
+    <string name="vector">Vector graphics</string>
+
+    <string-array name="geometric_figures">
+        <item>line</item>
+        <item>triangle</item>
+        <item>square</item>
+        <item>circle</item>
+    </string-array>
 </resources>

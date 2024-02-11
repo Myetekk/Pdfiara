@@ -9,13 +9,18 @@
         >
 
         <item
-            android:id="@+id/choose_paint"
-            android:title="@string/paint"
+            android:id="@+id/choose_text"
+            android:title="@string/text"
             />
 
         <item
-            android:id="@+id/choose_text_pdf"
-            android:title="@string/text_pdf"
+            android:id="@+id/choose_image"
+            android:title="@string/image"
+            />
+
+        <item
+            android:id="@+id/choose_vector"
+            android:title="@string/vector"
             />
 
     </group>

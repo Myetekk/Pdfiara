@@ -90,13 +90,16 @@ class PdfGenerator {
 
 
 
-    fun addPage(): Pages {    // dodanie nowej strony do pliku
+    fun addPage() {    // dodanie nowej strony do pliku
         val page = Pages()  // stworzenie strony - obiektu klasy Pages
 
         page.index = page_counter++  // przypisanie numeru strony danej stronie
         pages.add(page)  // dodanie strony do listy stron
 
-        return page  // zwrócenie utworzonej strony (żeby można było się odnosić do konkretnych stron)
+        PagesListName.add("Page ${page.index}")
+        PagesList.add(page)
+
+//        return page  // zwrócenie utworzonej strony (żeby można było się odnosić do konkretnych stron)
     }
 
 
@@ -213,7 +216,18 @@ class PdfGenerator {
         saveThings()    // dopisanie wszystkich tekstów, obrazów i grafiki wektorowej, oraz zapisanie roota
 
         addTrailer()    // dopisanie stopki  pliku PDF
+    }
 
+
+
+
+
+
+
+
+
+
+    fun clearPDF(){
         pages.clear()    // usunięcie zawartości listy po zapisaniu, żeby po zapisaniu nie zapisywać wielokrotnie tego samego
     }
 
